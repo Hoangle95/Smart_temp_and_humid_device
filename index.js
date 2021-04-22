@@ -2,14 +2,18 @@ var config = {};
 config.IOT_BROKER_ENDPOINT      = "auz0gmuq1udbf-ats.iot.us-west-1.amazonaws.com";
 config.IOT_BROKER_REGION        = "us-west-1";
 config.IOT_THING_NAME           = "DHT11_Demo";
-config.params                   = { thingName: 'DHT11_Demo' };
+config.params                   = { thingName: 'DHT11_Demo', shadowName: '$aws/things/DHT11_Demo/shadow/update'};
 //Loading AWS SDK libraries
 
 var AWS = require('aws-sdk');
+var topic = "$aws/things/DHT11_Demo/shadow/update"
 AWS.config.region = config.IOT_BROKER_REGION;
+
+
 
 //Initializing client for IoT
 var iotData = new AWS.IotData({endpoint: config.IOT_BROKER_ENDPOINT});
+
 
 // Route the incoming request based on type (LaunchRequest, IntentRequest,
 // etc.) The JSON body of the request is provided in the event parameter.
@@ -95,6 +99,37 @@ function onIntent(intentRequest, session, callback) {
 function onSessionEnded(sessionEndedRequest, session) {
     console.log("onSessionEnded requestId=" + sessionEndedRequest.requestId +
         ", sessionId=" + session.sessionId);
+    // Add cleanup logic here
+}
+
+// --------------- Functions that control the skill's behavior -----------------------
+
+function getWelcomeResponse(callback) {
+    var sessionAttributes = {};
+    var cardTitle = "Welcome";
+    var speechOutput = "Welcome to Hoang's House, Where I communicate with some sensors in the house," + 
+    "Would you like to know the temperature or humidity?";
+    var repromptText = "Would you like to know the temperature or humidity?";
+    var shouldEndSession = false;
+
+    callback(sessionAttributes, buildSpeechletResponse(cardTitle, speechOutput, repromptText, shouldEndSession));
+}
+
+function getHelp(callback) {
+    var cardTitle = "Help";
+    var speechOutput = "Welcome to Hoang's House, Where I communicate with some sensors in the house" + 
+    "You can ask me what the temerature or humidity is, or ask about the weather for both.";
+    var repromptText = "Would you like to know the temperature or humidity?";
+    var shouldEndSession = false;
+
+    callback(sessionAttributes, buildSpeechletResponse(cardTitle, speechOutput, repromptText, shouldEndSession));
+}
+
+function handleSessionEndRequest(callback) {
+    var cardTitle = "Session Ended";
+    var speechOutput = "Thank you for visiting Hoang's House, Have a nice day!";
+    var shouldEndSession = true;
+    callback({}, buildSpeechletResponse(cardTitle, speechOutput, null, shouldEndSession));
 }
 
 function getTemperature(intent, session, callback) {
@@ -105,18 +140,21 @@ function getTemperature(intent, session, callback) {
 
    var temp = 0;
 
-   iotData.getThingShadow(config.params, function(err, data) {
+  iotData.getThingShadow(config.params, function(err, data) {
       if (err)  {
-           console.log(err, err.stack); // an error occurred
+          console.log(err, err.stack); // an error occurred
       } else {
-           console.log(data.payload);           // successful response
-           payload = JSON.parse(data.payload);
-           temp = payload.state.reported.temp;
+          console.log(data.payload);           // successful response
+          payload = JSON.parse(data.payload);
+          console.log(payload)
+          temp = payload.state.reported.temperature;
       }
-
+      
+      
       speechOutput = "The temperature is " + temp + " degrees celcius";
       callback(sessionAttributes, buildSpeechletResponse(cardTitle, speechOutput, repromptText, shouldEndSession));
-   });
+  });
+
 }
 
 function getHumidity(intent, session, callback) {
@@ -156,7 +194,7 @@ function getWeather(intent, session, callback) {
       } else {
            //console.log(data.payload);           // successful response
            payload = JSON.parse(data.payload);
-           temp = payload.state.reported.temp;
+           temp = payload.state.reported.temperature;
            humidity = payload.state.reported.humidity;
       }
 
