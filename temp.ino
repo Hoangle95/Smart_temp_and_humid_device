@@ -14,7 +14,7 @@
 
 DHT dht(DHT_PIN, DHT_TYPE);
 AWS_IOT aws;
-
+char reportpayload[512];
 void setup(){
   Serial.begin(9600);
   Serial.print("\nInitializing thing Temp_Humidity_DHT11_0 \n");
@@ -63,13 +63,15 @@ void loop(){
    
     char payload[40];
     temp_humidity.toCharArray(payload, 40);
-
+    sprintf(reportpayload,"{\"state\": {\"reported\": {\"temperature\": \"%0.1f\",\"humidity\": \"%0.1f\"}}}",temp, humidity);
     Serial.println("Publishing:- ");
     Serial.println(payload);
-     if(aws.publish(MQTT_TOPIC, payload) == 0){// publishes payload and returns 0 upon success
+    Serial.println(reportpayload);
+     if(aws.publish(MQTT_TOPIC, reportpayload) == 0){// publishes payload and returns 0 upon success
       Serial.println("Success\n");
     }
     else{
+      
       Serial.println("Failed!\n");
     }
   }
