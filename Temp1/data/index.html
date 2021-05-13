@@ -7,6 +7,8 @@ The above copyright notice and this permission notice shall be included in all
 copies or substantial portions of the Software. -->
 <head>
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@500&display=swap" rel="stylesheet">
   <script src="https://code.highcharts.com/highcharts.js"></script>
   <style>
     body {
@@ -16,7 +18,7 @@ copies or substantial portions of the Software. -->
       margin: 0 auto;
     }
     h2 {
-      font-family: Arial;
+      font-family: 'Raleway', Arial;
       font-size: 2.5rem;
       text-align: center;
     }
@@ -31,7 +33,7 @@ copies or substantial portions of the Software. -->
 <script>
 var chartT = new Highcharts.Chart({
   chart:{ renderTo : 'chart-temperature' },
-  title: { text: 'BME280 Temperature' },
+  title: { text: 'DHT Temperature' },
   series: [{
     showInLegend: false,
     data: []
@@ -43,7 +45,8 @@ var chartT = new Highcharts.Chart({
     series: { color: '#059e8a' }
   },
   xAxis: { type: 'datetime',
-    dateTimeLabelFormats: { second: '%H:%M:%S' }
+    dateTimeLabelFormats: { second: '%H:%M:%S' },
+    title: { text: 'Timestamp '}
   },
   yAxis: {
     title: { text: 'Temperature (Celsius)' }
@@ -71,7 +74,7 @@ setInterval(function ( ) {
 
 var chartH = new Highcharts.Chart({
   chart:{ renderTo:'chart-humidity' },
-  title: { text: 'BME280 Humidity' },
+  title: { text: 'DHT Humidity' },
   series: [{
     showInLegend: false,
     data: []
@@ -83,7 +86,8 @@ var chartH = new Highcharts.Chart({
   },
   xAxis: {
     type: 'datetime',
-    dateTimeLabelFormats: { second: '%H:%M:%S' }
+    dateTimeLabelFormats: { second: '%H:%M:%S' },
+    title: { text: 'Timestamp '}
   },
   yAxis: {
     title: { text: 'Humidity (%)' }
