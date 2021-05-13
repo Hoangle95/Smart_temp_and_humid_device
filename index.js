@@ -6,6 +6,7 @@ config.params                   = { thingName: 'DHT11_Demo', shadowName: '$aws/t
 //Loading AWS SDK libraries
 
 var AWS = require('aws-sdk');
+var sns = new AWS.SNS();
 var topic = "$aws/things/DHT11_Demo/shadow/update"
 AWS.config.region = config.IOT_BROKER_REGION;
 
@@ -151,10 +152,25 @@ function getTemperature(intent, session, callback) {
       }
       
       
-      speechOutput = "The temperature is " + temp + " degrees celcius";
+      speechOutput = "The temperature is " + temp + " degrees celsius";
+      
+
+        let now = new Date().toString();
+        let email = speechOutput;
+        let params = {
+            Message: email,
+            Subject: 'IoT Temperature',
+            TopicArn: 'arn:aws:sns:us-west-1:729110466659:my-topic'
+        };
+        
+        sns.publish(params, function(err, data) {
+          if (err) console.log(err, err.stack); // an error occurred
+          else     console.log(data);           // successful response
+        });
+          
       callback(sessionAttributes, buildSpeechletResponse(cardTitle, speechOutput, repromptText, shouldEndSession));
   });
-
+  
 }
 
 function getHumidity(intent, session, callback) {
@@ -175,6 +191,20 @@ function getHumidity(intent, session, callback) {
       }
 
       speechOutput = "The humidity is " + humidity + " percent.";
+      
+       let now = new Date().toString();
+        let email = speechOutput;
+        let params = {
+            Message: email,
+            Subject: 'IoT Humidity',
+            TopicArn: 'arn:aws:sns:us-west-1:729110466659:my-topic'
+        };
+        
+        sns.publish(params, function(err, data) {
+          if (err) console.log(err, err.stack); // an error occurred
+          else     console.log(data);           // successful response
+        });
+      
       callback(sessionAttributes, buildSpeechletResponse(cardTitle, speechOutput, repromptText, shouldEndSession));
    });
 }
@@ -199,6 +229,20 @@ function getWeather(intent, session, callback) {
       }
 
       speechOutput = "The temperature is " + temp + " degrees celcius and the humidity is " + humidity + " percent";
+      
+      let now = new Date().toString();
+        let email = speechOutput;
+        let params = {
+            Message: email,
+            Subject: 'IoT Temperature and Humidity',
+            TopicArn: 'arn:aws:sns:us-west-1:729110466659:my-topic'
+        };
+        
+        sns.publish(params, function(err, data) {
+          if (err) console.log(err, err.stack); // an error occurred
+          else     console.log(data);           // successful response
+        });
+      
       callback(sessionAttributes, buildSpeechletResponse(cardTitle, speechOutput, repromptText, shouldEndSession));
    });
 }
