@@ -95,9 +95,6 @@ void setup(){
   server.on("/humidity", HTTP_GET, [](AsyncWebServerRequest *request){
     request->send_P(200, "text/plain", readHumidityForChart().c_str());
   });
- /* server.on("/pressure", HTTP_GET, [](AsyncWebServerRequest *request){
-    request->send_P(200, "text/plain", readBME280Pressure().c_str());
-  });*/
 
   // Start server
   server.begin();
